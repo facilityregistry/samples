@@ -1,83 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  targetNamespace="http:www.openfacility.org/v1.0" xmlns:fac="http:www.openfacility.org/v1.0"
-  xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
-
-  <xs:import namespace="http://www.w3.org/2003/01/geo/wgs84_pos#" schemaLocation="geo.xsd"/>
-
-  <xs:annotation>
-    <xs:documentation>This schema defines the representation of a health facility It is
+<!-- edited with XMLSpy v2011 (http://www.altova.com) by Laura Graham (Mohawk College) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fac="http:www.openfacility.org/v1.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" targetNamespace="http:www.openfacility.org/v1.0" elementFormDefault="qualified">
+	<xs:import namespace="http://www.w3.org/2003/01/geo/wgs84_pos#" schemaLocation="geo.xsd"/>
+	<xs:annotation>
+		<xs:documentation>This schema defines the representation of a health facility It is
       deliberately permissive, providing a minimal framework of mandatory elements and flexible
       opportunity for extension.</xs:documentation>
-  </xs:annotation>
-
-  <xs:element name="facility">
-    <xs:complexType>
-      <xs:sequence>
-        <!-- the following are mandatory elements -->
-        <xs:element ref="fac:name"/>
-        <xs:element ref="fac:url"/>
-        <xs:element ref="fac:identities"/>
-        <xs:element ref="fac:active"/>
-        <xs:element ref="geo:lat"/>
-        <xs:element ref="geo:long"/>
-
-        <!-- the following are optional elements -->
-        <xs:element ref="fac:approvalDate" minOccurs="0"/>
-        <xs:element ref="fac:link" minOccurs="0" maxOccurs="unbounded"/>
-
-        <!-- 
+	</xs:annotation>
+	<xs:element name="facility" type="fac:Facility">
+		<xs:annotation>
+			<xs:documentation>Root element for a facility</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="Facility">
+		<xs:annotation>
+			<xs:documentation>A facility represents a point of service where services are provided to client (consumers of those services). These can be (but are not necessarily restricted to) healthcare delivery services, administrative functions, etc.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<!-- the following are mandatory elements -->
+			<xs:element name="name" type="xs:NCName">
+				<xs:annotation>
+					<xs:documentation>A name for the facility in the primary language which the facility registry is servicing.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<!-- TODO: Does this need to be here or can identities/identity be collapsed to this level? -->
+			<xs:element name="url" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>TODO: How is this different than identities/identity</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="identities" type="fac:Identities"/>
+			<xs:element name="active" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>A boolean value which indicates whether the current facility record is active.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="approvalDate" type="fac:ComplexDate">
+				<xs:annotation>
+					<xs:documentation>The date on which the facility resource did become (or will become) approved.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="geo:lat"/>
+			<xs:element ref="geo:long"/>
+			<!-- the following are optional elements -->
+			<xs:element name="link" type="fac:Link" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>One or more links which allow this facility resource to reference other resources on the facility service provider or on other service providers (such as the provider registry)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<!-- 
         -->
-        <xs:sequence minOccurs="0">
-          <xs:annotation>
-            <xs:documentation>Any other elements may appear here so long as they are in their own
+			<xs:sequence minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Any other elements may appear here so long as they are in their own
               namespace. Conforming producers can use this to provide additional reference metadata
               about the facility which might be peculiar to the producer application. Conforming
               consumers may ignore this.</xs:documentation>
-          </xs:annotation>
-          <xs:any namespace="##other" processContents="lax"/>
-        </xs:sequence>
-
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="name" type="xs:NCName"/>
-  <xs:element name="url" type="xs:anyURI"/>
-
-  <!-- a facility registry should be able to broker between different identifiers -->
-  <xs:element name="identities">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="fac:guid"/>
-        <xs:element maxOccurs="unbounded" ref="fac:identity"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="guid" type="xs:anyURI"/>
-
-  <!-- an identifier may have any number of additional attributes, eg to model an hl7 identifier -->
-  <!-- context and id are mandatory -->
-  <xs:element name="identity">
-    <xs:complexType>
-      <xs:attribute name="agency" use="optional" type="xs:NCName"/>
-      <xs:attribute name="context" use="required" type="xs:NCName"/>
-      <xs:attribute name="id" use="required" type="xs:NMTOKEN"/>
-      <xs:anyAttribute/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="active" type="xs:boolean"/>
-
-  <xs:element name="approvalDate" type="xs:date"/>
-
-  <!-- link provides a way associate external resources to this facility, eg those which might be in other registries -->
-  <!-- links are optional and any number of links are allowed -->
-  <xs:element name="link">
-    <xs:complexType>
-      <xs:attribute name="name" use="required" type="xs:NCName"/>
-      <xs:attribute name="url" use="required" type="xs:anyURI"/>
-      <xs:anyAttribute/>
-    </xs:complexType>
-  </xs:element>
+				</xs:annotation>
+				<xs:any namespace="##other" processContents="lax"/>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- a facility registry should be able to broker between different identifiers -->
+	<xs:complexType name="Identities">
+		<xs:annotation>
+			<xs:documentation>A logical grouping of identifiers which can be used to identify a facility. A facility will have one and only one primary identifier which is a URL/URI reference to the resource</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="guid" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Identifies the URL of the facility resource</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="identity" type="fac:Identity" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Optional additional identifiers that the facility is known by in the facility registry. These may be local identifiers, MOH registration numbers, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- an identifier may have any number of additional attributes, eg to model an hl7 identifier -->
+	<!-- context and id are mandatory -->
+	<xs:complexType name="Identity">
+		<xs:annotation>
+			<xs:documentation>Provides a mechanism for identifying a facility and specifying an assigning authority for that identifier</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="agency" type="xs:NCName" use="optional">
+			<xs:annotation>
+				<xs:documentation>The agency that owns the identity</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="context" type="xs:NCName" use="required">
+			<xs:annotation>
+				<xs:documentation>The context in which the identifier should be used</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="id" type="xs:NMTOKEN" use="required">
+			<xs:annotation>
+				<xs:documentation>The identifier</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:anyAttribute>
+			<xs:annotation>
+				<xs:documentation>Extended attributes are placed here</xs:documentation>
+			</xs:annotation>
+		</xs:anyAttribute>
+	</xs:complexType>
+	<xs:simpleType name="BasicDate">
+		<xs:annotation>
+			<xs:documentation>A basic union between xs:date and xs:dateTime</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:date xs:dateTime"/>
+	</xs:simpleType>
+	<xs:complexType name="ComplexDate">
+		<xs:annotation>
+			<xs:documentation>Provides a mechanism for qualifying the precision of a date, note that providing date precisions is optional</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="fac:BasicDate">
+				<xs:attribute name="precision" use="optional">
+					<xs:annotation>
+						<xs:documentation>An optional qualification on the date specifying to precision of the date value</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="D"/>
+							<xs:enumeration value="M"/>
+							<xs:enumeration value="Y"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- links are optional and any number of links are allowed -->
+	<xs:complexType name="Link">
+		<xs:annotation>
+			<xs:documentation>Provides a mechanism for associating external resources to this facility, eg those which might be in other registries </xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:NCName" use="required">
+			<xs:annotation>
+				<xs:documentation>Identifies the name of the link.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="url" type="xs:anyURI" use="required">
+			<xs:annotation>
+				<xs:documentation>Identifies the url which points to the resource being linked to</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:anyAttribute>
+			<xs:annotation>
+				<xs:documentation>Extended attributes</xs:documentation>
+			</xs:annotation>
+		</xs:anyAttribute>
+	</xs:complexType>
 </xs:schema>
